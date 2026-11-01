@@ -1,0 +1,58 @@
+{
+  "name": "Dr. Aditya Khandelwal \u00e2\u20ac\u201d Clinic App",
+  "short_name": "Dr. Aditya",
+  "description": "Book appointments with Dr. Aditya Khandelwal, MBBS \u00e2\u20ac\u201d clinic in Kota, Rajasthan.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fbfaf6",
+  "theme_color": "#0d7f72",
+  "lang": "en-IN",
+  "categories": [
+    "health",
+    "medical"
+  ],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Book appointment",
+      "url": "./index.html#book",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Call clinic",
+      "url": "tel:+919351222159",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
