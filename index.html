@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0d7f72">
+<title>Dr. Aditya Khandelwal — Clinic App</title>
+<meta name="description" content="Book appointments with Dr. Aditya Khandelwal, MBBS — clinic in Kota, Rajasthan.">
+
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dr. Aditya">
+<meta name="mobile-web-app-capable" content="yes">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ink:#0f2b2e;
+    --ink-soft:#5c7774;
+    --teal:#0d7f72;
+    --teal-dark:#0a5a50;
+    --teal-tint:#e6f4f1;
+    --cream:#f6f8f7;
+    --white:#ffffff;
+    --line:#e2eae7;
+    --gold:#c99a3f;
+    --danger:#c0392b;
+    --safe-top:env(safe-area-inset-top, 0px);
+    --safe-bottom:env(safe-area-inset-bottom, 0px);
+    --tab-h:64px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+    background:var(--cream);color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    overscroll-behavior-y:contain;
+  }
+  button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+  a{text-decoration:none;color:inherit}
+
+  /* ---------- app shell ---------- */
+  .app{
+    max-width:520px;margin:0 auto;min-height:100vh;
+    background:var(--cream);position:relative;
+    padding-bottom:calc(var(--tab-h) + var(--safe-bottom));
+  }
+
+  /* ---------- header ---------- */
+  .appbar{
+    position:sticky;top:0;z-index:30;
+    padding:calc(var(--safe-top) + 14px) 20px 14px;
+    background:linear-gradient(160deg,#0d7f72 0%,#0a5a50 100%);
+    color:#fff;
+    border-radius:0 0 22px 22px;
+    box-shadow:0 8px 24px -14px rgba(10,90,80,.8);
+  }
+  .appbar .top{display:flex;align-items:center;gap:12px}
+  .appbar .avatar{
+    width:44px;height:44px;border-radius:13px;flex:none;
+    background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);
+    display:grid;place-items:center;font-weight:700;font-size:.95rem;letter-spacing:.03em;
+  }
+  .appbar h1{font-size:1.02rem;font-weight:600;line-height:1.25}
+  .appbar .sub{font-size:.72rem;color:#a8d8cf;letter-spacing:.09em;text-transform:uppercase;margin-top:2px}
+  .appbar .online{
+    margin-left:auto;font-size:.66rem;font-weight:600;
+    background:rgba(255,255,255,.14);padding:5px 10px;border-radius:999px;
+    display:flex;align-items:center;gap:5px;white-space:nowrap;
+  }
+  .appbar .online i{width:5px;height:5px;border-radius:50%;background:#4ade80}
+
+  /* ---------- pages ---------- */
+  .page{display:none;padding:18px 16px 8px;animation:fade .25s ease}
+  .page.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .section-title{font-size:.72rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);margin:22px 4px 10px}
+  .section-title:first-child{margin-top:4px}
+
+  .card{
+    background:var(--white);border-radius:16px;padding:16px;
+    border:1px solid var(--line);
+    box-shadow:0 1px 2px rgba(15,43,46,.03);
+  }
+  .card + .card{margin-top:10px}
+
+  /* quick actions */
+  .quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .qa{
+    border-radius:16px;padding:16px 14px;text-align:left;
+    display:flex;flex-direction:column;gap:9px;
+    font-weight:600;font-size:.87rem;border:1px solid transparent;
+    transition:transform .12s;
+  }
+  .qa:active{transform:scale(.975)}
+  .qa .ico{width:34px;height:34px;border-radius:10px;display:grid;place-items:center}
+  .qa.primary{background:var(--teal);color:#fff;box-shadow:0 8px 20px -12px rgba(13,127,114,.9)}
+  .qa.primary .ico{background:rgba(255,255,255,.18)}
+  .qa.wa{background:#e8faf0;color:#0a6b3c;border-color:#c8f0d9}
+  .qa.wa .ico{background:#25d366;color:#fff}
+  .qa.call{background:var(--white);color:var(--ink);border-color:var(--line)}
+  .qa.call .ico{background:var(--teal-tint);color:var(--teal-dark)}
+  .qa.wa2{background:var(--white);color:var(--ink);border-color:var(--line)}
+  .qa.wa2 .ico{background:#fff3d6;color:#a8761f}
+
+  /* doctor card */
+  .doc{display:flex;gap:14px;align-items:center}
+  .doc .pic{
+    width:62px;height:62px;border-radius:18px;flex:none;
+    background:linear-gradient(150deg,#0d7f72,#08403a);color:#fff;
+    display:grid;place-items:center;font-size:1.25rem;font-weight:700;
+    box-shadow:0 10px 22px -12px rgba(13,127,114,.9);
+  }
+  .doc h2{font-size:1rem;font-weight:600}
+  .doc .q{font-size:.72rem;color:var(--teal);letter-spacing:.08em;text-transform:uppercase;font-weight:600;margin-top:3px}
+  .doc .loc{font-size:.78rem;color:var(--ink-soft);margin-top:5px;display:flex;align-items:center;gap:4px}
+
+  /* upcoming appointment */
+  .upcoming{
+    background:linear-gradient(150deg,#0d7f72,#0a5a50);color:#fff;
+    border-radius:16px;padding:16px;position:relative;overflow:hidden;
+  }
+  .upcoming::after{content:"";position:absolute;width:150px;height:150px;border-radius:50%;border:1px solid rgba(255,255,255,.12);right:-50px;bottom:-70px}
+  .upcoming .lbl{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:#a8d8cf;font-weight:600}
+  .upcoming .when{font-size:1.1rem;font-weight:600;margin-top:6px}
+  .upcoming .meta{font-size:.8rem;color:#cfe8e3;margin-top:4px}
+  .upcoming .cancel{margin-top:12px;font-size:.78rem;font-weight:600;color:#ffc9c2;background:rgba(255,255,255,.1);padding:7px 13px;border-radius:999px;display:inline-block}
+
+  /* hours list */
+  .hours-row{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);font-size:.86rem}
+  .hours-row:last-child{border-bottom:0}
+  .hours-row .day{font-weight:600}
+  .hours-row .t{color:var(--ink-soft);text-align:right}
+  .hours-row.today .day{color:var(--teal)}
+  .hours-row.today .day::after{content:" •";color:var(--gold)}
+  .hours-row.closed .t{color:var(--danger);font-weight:600}
+
+  /* services */
+  .svc{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--line)}
+  .svc:last-child{border-bottom:0}
+  .svc .ico{width:34px;height:34px;border-radius:10px;flex:none;background:var(--teal-tint);color:var(--teal-dark);display:grid;place-items:center}
+  .svc strong{display:block;font-size:.88rem;font-weight:600}
+  .svc span{font-size:.78rem;color:var(--ink-soft);line-height:1.5;display:block;margin-top:2px}
+
+  /* form */
+  .field{margin-bottom:13px}
+  .field label{display:block;font-size:.76rem;font-weight:600;margin-bottom:6px;color:var(--ink)}
+  .field input,.field select,.field textarea{
+    width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:12px;
+    font-family:inherit;font-size:16px;color:var(--ink);background:#fff;
+    transition:border-color .18s,box-shadow .18s;
+  }
+  .field input:focus,.field select:focus,.field textarea:focus{
+    outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,127,114,.13);
+  }
+  .field textarea{resize:none;min-height:70px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{
+    padding:9px 15px;border-radius:999px;border:1px solid var(--line);
+    font-size:.8rem;font-weight:600;color:var(--ink-soft);background:#fff;
+    transition:.15s;
+  }
+  .chip.on{background:var(--teal);border-color:var(--teal);color:#fff}
+
+  .submit{
+    width:100%;padding:16px;border-radius:14px;background:var(--teal);color:#fff;
+    font-weight:700;font-size:.94rem;margin-top:6px;
+    box-shadow:0 10px 24px -12px rgba(13,127,114,.95);
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .submit:active{transform:scale(.985)}
+  .submit:disabled{opacity:.55}
+
+  .note{font-size:.76rem;color:var(--ink-soft);text-align:center;margin-top:10px;line-height:1.5}
+
+  .alert{border-radius:12px;padding:12px 14px;font-size:.82rem;margin-top:12px;display:none}
+  .alert.ok{display:block;background:#e7f8ef;color:#0a6b3c;border:1px solid #b9ebcf}
+  .alert.err{display:block;background:#fdecea;color:#a33227;border:1px solid #f6c8c2}
+
+  /* my appointments */
+  .empty{
+    text-align:center;padding:48px 24px;color:var(--ink-soft);
+  }
+  .empty .ico{width:60px;height:60px;border-radius:18px;background:var(--teal-tint);color:var(--teal);display:grid;place-items:center;margin:0 auto 16px}
+  .empty h3{font-size:.95rem;color:var(--ink);margin-bottom:6px}
+  .empty p{font-size:.82rem;line-height:1.5}
+
+  .appt-item{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:10px}
+  .appt-item .head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .appt-item .date{font-weight:700;font-size:.92rem}
+  .appt-item .tm{font-size:.78rem;color:var(--ink-soft);margin-top:3px}
+  .appt-item .tag{font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--teal-tint);color:var(--teal-dark);padding:4px 9px;border-radius:999px;white-space:nowrap}
+  .appt-item .tag.past{background:#f0f0ee;color:#8a8a86}
+  .appt-item .actions{display:flex;gap:8px;margin-top:12px}
+  .appt-item .actions button,.appt-item .actions a{
+    flex:1;text-align:center;font-size:.78rem;font-weight:600;padding:9px;border-radius:10px;
+    border:1px solid var(--line);color:var(--ink-soft);background:#fff;
+  }
+  .appt-item .actions .del{color:var(--danger);border-color:#f6d7d3}
+
+  /* install banner */
+  .install{
+    display:none;align-items:center;gap:12px;
+    background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px 14px;
+    margin-bottom:12px;box-shadow:0 4px 14px -10px rgba(15,43,46,.4);
+  }
+  .install.show{display:flex}
+  .install .ico{width:36px;height:36px;border-radius:11px;background:var(--teal-tint);color:var(--teal-dark);display:grid;place-items:center;flex:none}
+  .install .txt{flex:1;min-width:0}
+  .install .txt strong{display:block;font-size:.84rem}
+  .install .txt span{font-size:.72rem;color:var(--ink-soft)}
+  .install .go{background:var(--teal);color:#fff;font-size:.76rem;font-weight:700;padding:9px 15px;border-radius:999px;flex:none}
+
+  /* tab bar */
+  .tabbar{
+    position:fixed;bottom:0;left:0;right:0;z-index:40;
+    max-width:520px;margin:0 auto;
+    background:rgba(255,255,255,.94);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    border-top:1px solid var(--line);
+    display:flex;padding-bottom:var(--safe-bottom);
+    height:calc(var(--tab-h) + var(--safe-bottom));
+  }
+  .tab{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;font-size:.64rem;font-weight:600;color:#93a8a4;
+    transition:color .18s;
+  }
+  .tab.active{color:var(--teal)}
+  .tab svg{width:21px;height:21px}
+  .tab.fab{flex:none;width:64px;position:relative}
+  .tab.fab .plus{
+    width:50px;height:50px;border-radius:17px;background:var(--teal);color:#fff;
+    display:grid;place-items:center;position:absolute;top:-16px;
+    box-shadow:0 10px 22px -10px rgba(13,127,114,.95);
+    border:3px solid var(--cream);
+  }
+
+  /* toast */
+  .toast{
+    position:fixed;left:50%;bottom:calc(var(--tab-h) + 24px + var(--safe-bottom));
+    transform:translate(-50%,20px);opacity:0;pointer-events:none;
+    background:#0f2b2e;color:#fff;font-size:.82rem;font-weight:500;
+    padding:11px 18px;border-radius:999px;z-index:80;transition:.28s;
+    max-width:88vw;text-align:center;
+  }
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- header -->
+  <header class="appbar">
+    <div class="top">
+      <div class="avatar">AK</div>
+      <div>
+        <h1>Dr. Aditya Khandelwal</h1>
+        <div class="sub">MBBS &middot; Kota</div>
+      </div>
+      <div class="online"><i></i> Open</div>
+    </div>
+  </header>
+
+  <!-- ============ HOME ============ -->
+  <main class="page active" id="page-home">
+
+    <div class="install" id="installBanner">
+      <div class="ico">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>
+      </div>
+      <div class="txt">
+        <strong>Install this app</strong>
+        <span>Add to home screen for quick access</span>
+      </div>
+      <button class="go" id="installBtn">Install</button>
+    </div>
+
+    <div id="upcomingSlot"></div>
+
+    <div class="section-title">Quick actions</div>
+    <div class="quick">
+      <button class="qa primary" data-go="book">
+        <div class="ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4"/></svg></div>
+        Book appointment
+      </button>
+      <a class="qa call" href="tel:+919351222159">
+        <div class="ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+        Call clinic
+      </a>
+      <a class="qa wa" href="https://wa.me/919351222159?text=Hello%20Dr.%20Aditya%2C%20I%20would%20like%20to%20book%20an%20appointment." target="_blank" rel="noopener">
+        <div class="ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.65.08-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.05-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.6-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.01-1.04 2.47s1.06 2.87 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.75-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35z"/><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm0 18.15c-1.53 0-3.03-.41-4.34-1.19l-.31-.18-3.22.84.86-3.14-.2-.32a8.19 8.19 0 0 1-1.26-4.37c0-4.54 3.7-8.23 8.24-8.23 4.54 0 8.23 3.69 8.23 8.23 0 4.54-3.69 8.24-8.23 8.24z"/></svg></div>
+        WhatsApp
+      </a>
+      <a class="qa wa2" href="https://www.google.com/maps/search/?api=1&query=Kota,Rajasthan,India" target="_blank" rel="noopener">
+        <div class="ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+        Directions
+      </a>
+    </div>
+
+    <div class="section-title">Your doctor</div>
+    <div class="card">
+      <div class="doc">
+        <div class="pic">AK</div>
+        <div>
+          <h2>Dr. Aditya Khandelwal</h2>
+          <div class="q">MBBS &middot; General Physician</div>
+          <div class="loc">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Kota, Rajasthan
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Today's timings</div>
+    <div class="card" id="todayHours"></div>
+
+    <div class="section-title">Clinic hours</div>
+    <div class="card" id="hoursList"></div>
+
+    <div class="section-title">Contact</div>
+    <div class="card">
+      <div class="svc" style="padding-top:2px">
+        <div class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+        <div><strong>Phone</strong><a href="tel:+919351222159"><span>+91 93512 22159</span></a></div>
+      </div>
+      <div class="svc" style="padding-bottom:2px">
+        <div class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg></div>
+        <div><strong>Email</strong><a href="mailto:adityakhandelwal@gmail.com"><span>adityakhandelwal@gmail.com</span></a></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============ BOOK ============ -->
+  <main class="page" id="page-book">
+    <div class="section-title">Request an appointment</div>
+    <div class="card">
+      <div class="field">
+        <label for="f-name">Full name</label>
+        <input type="text" id="f-name" placeholder="Your name" autocomplete="name" required>
+      </div>
+      <div class="field">
+        <label for="f-phone">Phone number</label>
+        <input type="tel" id="f-phone" placeholder="10-digit mobile" inputmode="numeric" autocomplete="tel" required>
+      </div>
+      <div class="field">
+        <label for="f-date">Preferred date</label>
+        <input type="date" id="f-date" required>
+      </div>
+      <div class="field">
+        <label>Preferred time</label>
+        <div class="chips" id="timeChips">
+          <button type="button" class="chip on" data-time="Morning (10 AM – 2 PM)">Morning</button>
+          <button type="button" class="chip" data-time="Evening (5 PM – 8 PM)">Evening</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Visit type</label>
+        <div class="chips" id="typeChips">
+          <button type="button" class="chip on" data-type="New consultation">New</button>
+          <button type="button" class="chip" data-type="Follow-up">Follow-up</button>
+          <button type="button" class="chip" data-type="Health check-up">Check-up</button>
+          <button type="button" class="chip" data-type="Report review">Reports</button>
+        </div>
+      </div>
+      <div class="field">
+        <label for="f-notes">Reason / symptoms <span style="font-weight:400;color:var(--ink-soft)">(optional)</span></label>
+        <textarea id="f-notes" placeholder="Briefly describe your concern"></textarea>
+      </div>
+      <button class="submit" id="bookBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.3-.15-1.75-.86-2.02-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.65.08-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.05-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.6-.92-2.2-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.01-1.04 2.47s1.06 2.87 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.63.71.22 1.36.19 1.87.12.57-.09 1.75-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35z"/><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.46 1.32 4.96L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm0 18.15c-1.53 0-3.03-.41-4.34-1.19l-.31-.18-3.22.84.86-3.14-.2-.32a8.19 8.19 0 0 1-1.26-4.37c0-4.54 3.7-8.23 8.24-8.23 4.54 0 8.23 3.69 8.23 8.23 0 4.54-3.69 8.24-8.23 8.24z"/></svg>
+        Send on WhatsApp
+      </button>
+      <div class="alert" id="bookAlert"></div>
+      <p class="note">Your request opens in WhatsApp, addressed to the clinic. You'll get a confirmation on the number you provide.</p>
+    </div>
+  </main>
+
+  <!-- ============ MY APPOINTMENTS ============ -->
+  <main class="page" id="page-appts">
+    <div class="section-title">My appointments</div>
+    <div id="apptList"></div>
+  </main>
+
+  <!-- ============ INFO ============ -->
+  <main class="page" id="page-info">
+    <div class="section-title">Services</div>
+    <div class="card">
+      <div class="svc">
+        <div class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></div>
+        <div><strong>General consultation</strong><span>Fever, cough, cold, infections, body ache, fatigue</span></div>
+      </div>
+      <div class="svc">
+        <div class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M19 14c1.5-1.5 3-3.3 3-5.5A5.5 5.5 0 0 0 12 5a5.5 5.5 0 0 0-10 3.5C2 10.7 3.5 12.5 5 14l7 7z"/></svg></div>
+        <div><strong>BP &amp; diabetes care</strong><span>Monitoring, medication review, lifestyle guidance</span></div>
+      </div>
+      <div class="svc">
+        <div class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 2h6v4H9zM12 6v4M8 10h8v4a4 4 0 0 1-4 4 4 4 0 0 1-4-4z"/><path d="M12 18v4"/></svg></div>
+        <div><strong>Health check-ups</strong><span>Preventive screening and routine investigations</span></div>
+      </div>
+      <div class="svc">
+        <div class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2a5 5 0 0 0-5 5v3a5 5 0 0 0 10 0V7a5 5 0 0 0-5-5z"/><path d="M5 12a7 7 0 0 0 14 0"/><path d="M12 19v3"/></svg></div>
+        <div><strong>Child &amp; family care</strong><span>Care for every age group in the household</span></div>
+      </div>
+      <div class="svc">
+        <div class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10z"/><path d="M9 11h6M12 8v6"/></svg></div>
+        <div><strong>Dressing &amp; injections</strong><span>Wound dressing and basic in-clinic procedures</span></div>
+      </div>
+      <div class="svc">
+        <div class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M9 12h6M9 16h6"/><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+        <div><strong>Report review</strong><span>Bring lab reports or prescriptions for a clear plan</span></div>
+      </div>
+    </div>
+
+    <div class="section-title">Clinic hours</div>
+    <div class="card" id="hoursList2"></div>
+
+    <div class="section-title">Location</div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <iframe title="Clinic location" src="https://www.google.com/maps?q=Kota,Rajasthan,India&output=embed" style="width:100%;height:190px;border:0;display:block" loading="lazy"></iframe>
+      <div style="padding:14px 16px">
+        <strong style="font-size:.86rem;display:block">Clinic address</strong>
+        <span style="font-size:.8rem;color:var(--ink-soft)">Kota, Rajasthan, India</span>
+        <a href="https://www.google.com/maps/search/?api=1&query=Kota,Rajasthan,India" target="_blank" rel="noopener" style="display:block;margin-top:9px;font-size:.8rem;font-weight:700;color:var(--teal)">Open in Google Maps →</a>
+      </div>
+    </div>
+
+    <div class="section-title">About</div>
+    <div class="card">
+      <p style="font-size:.85rem;line-height:1.65;color:var(--ink-soft)">
+        Dr. Aditya Khandelwal is a qualified physician (MBBS) practising in Kota, Rajasthan.
+        Consultations are unhurried and explained in plain language — no unnecessary tests
+        or medicines.
+      </p>
+    </div>
+
+    <p class="note" style="margin-top:22px;margin-bottom:14px">
+      This app is for general information and does not replace an in-person consultation.
+    </p>
+  </main>
+
+  <!-- tab bar -->
+  <nav class="tabbar">
+    <button class="tab active" data-tab="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+      Home
+    </button>
+    <button class="tab" data-tab="appts">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      My visits
+    </button>
+    <button class="tab fab" data-tab="book">
+      <div class="plus">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+    </button>
+    <button class="tab" data-tab="info">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
+      Info
+    </button>
+    <a class="tab" href="tel:+919351222159">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Call
+    </a>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  'use strict';
+
+  var CLINIC_WA = '919351222159';
+  var STORE = 'drAdityaAppointments';
+
+  /* ---------- helpers ---------- */
+  function $(s, r){ return (r||document).querySelector(s); }
+  function $$(s, r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
+
+  var toastEl = $('#toast');
+  var toastTimer;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 2400);
+  }
+
+  function pad(n){ return n < 10 ? '0' + n : '' + n; }
+  function todayISO(){
+    var d = new Date();
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+  }
+  function fmtDate(iso){
+    var p = iso.split('-');
+    var d = new Date(+p[0], +p[1]-1, +p[2]);
+    return d.toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+  }
+
+  /* ---------- navigation ---------- */
+  function showPage(name){
+    $$('.page').forEach(function(p){ p.classList.remove('active'); });
+    var target = $('#page-' + name);
+    if (target) target.classList.add('active');
+    $$('.tab').forEach(function(t){
+      t.classList.toggle('active', t.getAttribute('data-tab') === name);
+    });
+    window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+    if (name === 'appts') renderAppointments();
+    if (name === 'home') renderUpcoming();
+  }
+
+  $$('.tab').forEach(function(t){
+    t.addEventListener('click', function(){
+      var tab = t.getAttribute('data-tab');
+      if (tab) showPage(tab);
+    });
+  });
+  $$('[data-go]').forEach(function(b){
+    b.addEventListener('click', function(){ showPage(b.getAttribute('data-go')); });
+  });
+
+  /* ---------- hours ---------- */
+  var HOURS = [
+    { day:'Monday',    t:'10:00 AM – 2:00 PM · 5:00 PM – 8:00 PM', closed:false },
+    { day:'Tuesday',   t:'10:00 AM – 2:00 PM · 5:00 PM – 8:00 PM', closed:false },
+    { day:'Wednesday', t:'10:00 AM – 2:00 PM · 5:00 PM – 8:00 PM', closed:false },
+    { day:'Thursday',  t:'10:00 AM – 2:00 PM · 5:00 PM – 8:00 PM', closed:false },
+    { day:'Friday',    t:'10:00 AM – 2:00 PM · 5:00 PM – 8:00 PM', closed:false },
+    { day:'Saturday',  t:'10:00 AM – 2:00 PM', closed:false },
+    { day:'Sunday',    t:'Closed', closed:true }
+  ];
+
+  function renderHours(){
+    var todayIdx = (new Date().getDay() + 6) % 7; // Mon = 0
+    var html = HOURS.map(function(h, i){
+      var cls = 'hours-row' + (i === todayIdx ? ' today' : '') + (h.closed ? ' closed' : '');
+      return '<div class="' + cls + '"><span class="day">' + h.day + '</span><span class="t">' + h.t + '</span></div>';
+    }).join('');
+    var a = $('#hoursList'), b = $('#hoursList2');
+    if (a) a.innerHTML = html;
+    if (b) b.innerHTML = html;
+
+    var t = HOURS[todayIdx];
+    var slot = $('#todayHours');
+    if (slot){
+      slot.innerHTML = t.closed
+        ? '<div style="display:flex;align-items:center;gap:10px"><span style="width:8px;height:8px;border-radius:50%;background:#c0392b"></span><strong style="font-size:.88rem">Closed today (Sunday)</strong></div>'
+        : '<div style="display:flex;align-items:center;gap:10px"><span style="width:8px;height:8px;border-radius:50%;background:#16a34a"></span><div><strong style="font-size:.88rem">Open today</strong><div style="font-size:.78rem;color:var(--ink-soft);margin-top:2px">' + t.t + '</div></div></div>';
+    }
+  }
+
+  /* ---------- form ---------- */
+  var selTime = 'Morning (10 AM – 2 PM)';
+  var selType = 'New consultation';
+
+  $$('#timeChips .chip').forEach(function(c){
+    c.addEventListener('click', function(){
+      $$('#timeChips .chip').forEach(function(x){ x.classList.remove('on'); });
+      c.classList.add('on');
+      selTime = c.getAttribute('data-time');
+    });
+  });
+  $$('#typeChips .chip').forEach(function(c){
+    c.addEventListener('click', function(){
+      $$('#typeChips .chip').forEach(function(x){ x.classList.remove('on'); });
+      c.classList.add('on');
+      selType = c.getAttribute('data-type');
+    });
+  });
+
+  var dateInput = $('#f-date');
+  dateInput.min = todayISO();
+
+  var alertEl = $('#bookAlert');
+  function showAlert(kind, msg){
+    alertEl.className = 'alert ' + kind;
+    alertEl.textContent = msg;
+  }
+  function clearAlert(){ alertEl.className = 'alert'; alertEl.textContent = ''; }
+
+  function getAppointments(){
+    try { return JSON.parse(localStorage.getItem(STORE) || '[]'); }
+    catch(e){ return []; }
+  }
+  function saveAppointments(list){
+    try { localStorage.setItem(STORE, JSON.stringify(list)); } catch(e){}
+  }
+
+  $('#bookBtn').addEventListener('click', function(){
+    clearAlert();
+    var name = $('#f-name').value.trim();
+    var phone = $('#f-phone').value.trim().replace(/\D/g, '');
+    var date = dateInput.value;
+    var notes = $('#f-notes').value.trim();
+
+    if (!name){ showAlert('err', 'Please enter your name.'); return; }
+    if (!/^[6-9]\d{9}$/.test(phone.slice(-10))){
+      showAlert('err', 'Please enter a valid 10-digit mobile number.'); return;
+    }
+    if (!date){ showAlert('err', 'Please choose a preferred date.'); return; }
+
+    var appt = {
+      id: Date.now(),
+      name: name,
+      phone: phone.slice(-10),
+      date: date,
+      time: selTime,
+      type: selType,
+      notes: notes,
+      createdAt: new Date().toISOString()
+    };
+
+    var list = getAppointments();
+    list.push(appt);
+    saveAppointments(list);
+
+    var text = 'Appointment request\n\n'
+      + 'Name: ' + name + '\n'
+      + 'Phone: ' + appt.phone + '\n'
+      + 'Date: ' + fmtDate(date) + '\n'
+      + 'Time: ' + selTime + '\n'
+      + 'Visit: ' + selType
+      + (notes ? '\nConcern: ' + notes : '');
+
+    var url = 'https://wa.me/' + CLINIC_WA + '?text=' + encodeURIComponent(text);
+
+    showAlert('ok', 'Request saved. Opening WhatsApp…');
+    toast('Appointment saved');
+    window.open(url, '_blank');
+
+    // reset
+    $('#f-name').value = '';
+    $('#f-phone').value = '';
+    $('#f-notes').value = '';
+    dateInput.value = '';
+
+    setTimeout(function(){
+      showPage('appts');
+      clearAlert();
+    }, 900);
+  });
+
+  /* ---------- appointments list ---------- */
+  function renderAppointments(){
+    var list = getAppointments().sort(function(a,b){
+      return (a.date + a.time).localeCompare(b.date + b.time);
+    });
+    var el = $('#apptList');
+    var now = todayISO();
+
+    if (!list.length){
+      el.innerHTML = ''
+        + '<div class="empty">'
+        + '  <div class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>'
+        + '  <h3>No appointments yet</h3>'
+        + '  <p>Book your first visit and it will show up here.</p>'
+        + '</div>';
+      return;
+    }
+
+    el.innerHTML = list.map(function(a){
+      var past = a.date < now;
+      return ''
+        + '<div class="appt-item">'
+        + '  <div class="head">'
+        + '    <div>'
+        + '      <div class="date">' + fmtDate(a.date) + '</div>'
+        + '      <div class="tm">' + a.time.replace(/\(.*\)/, '').trim() + ' &middot; ' + a.type + '</div>'
+        + '    </div>'
+        + '    <span class="tag' + (past ? ' past' : '') + '">' + (past ? 'Past' : 'Upcoming') + '</span>'
+        + '  </div>'
+        + '  <div class="actions">'
+        + '    <a href="tel:+91' + a.phone + '">Call ' + a.phone + '</a>'
+        + '    <button class="del" data-del="' + a.id + '">Cancel</button>'
+        + '  </div>'
+        + '</div>';
+    }).join('');
+
+    $$('[data-del]', el).forEach(function(b){
+      b.addEventListener('click', function(){
+        var id = +b.getAttribute('data-del');
+        saveAppointments(getAppointments().filter(function(x){ return x.id !== id; }));
+        renderAppointments();
+        renderUpcoming();
+        toast('Appointment removed');
+      });
+    });
+  }
+
+  function renderUpcoming(){
+    var slot = $('#upcomingSlot');
+    var now = todayISO();
+    var up = getAppointments()
+      .filter(function(a){ return a.date >= now; })
+      .sort(function(a,b){ return (a.date + a.time).localeCompare(b.date + b.time); })[0];
+
+    if (!up){ slot.innerHTML = ''; return; }
+
+    slot.innerHTML = ''
+      + '<div class="upcoming">'
+      + '  <div class="lbl">Next appointment</div>'
+      + '  <div class="when">' + fmtDate(up.date) + '</div>'
+      + '  <div class="meta">' + up.time.replace(/\(.*\)/, '').trim() + ' &middot; ' + up.type + '</div>'
+      + '</div>';
+  }
+
+  /* ---------- install prompt ---------- */
+  var deferredPrompt = null;
+  var banner = $('#installBanner');
+  var installBtn = $('#installBtn');
+
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    banner.classList.add('show');
+  });
+
+  installBtn.addEventListener('click', function(){
+    if (!deferredPrompt){
+      toast('Use browser menu → Add to Home screen');
+      return;
+    }
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(choice){
+      if (choice.outcome === 'accepted'){ toast('App installed'); }
+      deferredPrompt = null;
+      banner.classList.remove('show');
+    });
+  });
+
+  window.addEventListener('appinstalled', function(){
+    banner.classList.remove('show');
+    toast('App installed');
+  });
+
+  // iOS has no beforeinstallprompt — show hint after a delay
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  var isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true;
+  if (isIOS && !isStandalone){
+    setTimeout(function(){ banner.classList.add('show'); }, 1500);
+    installBtn.addEventListener('click', function(){
+      toast('Tap Share → Add to Home Screen');
+    });
+  }
+
+  /* ---------- service worker ---------- */
+  if ('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('sw.js').catch(function(){});
+    });
+  }
+
+  /* ---------- init ---------- */
+  renderHours();
+  renderUpcoming();
+  renderAppointments();
+})();
+</script>
+</body>
+</html>
